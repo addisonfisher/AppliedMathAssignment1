@@ -1,21 +1,32 @@
-% --- Main Script ---
+function main()
 
-test_func01 = @(x) (x.^3)/100 - (x.^2)/8 + 2*x + 6*sin(x/2+6) - 0.7 - exp(x/6);
+    %first root
+    x_left = -15;
+    x_right = 10;
+    
+    [bi_root, bi_x0, bi_x1, bi_guess_it] = bisection_solver(@fun, x_left, x_right);
+    bi_x0; %current c guesses for bisection
+    bi_x1; %next c guesses for bisection
+    bi_guess_it; %iteration number for bisection
+    
+    fprintf('The first root found is: %.14f\n', bi_root);
+    
+    % %second root
+    % x_left = 25;
+    % x_right = 40;
+    % root2 = bisection_solver(@fun, x_left, x_right);
+    % fprintf('The second root found is: %.14f\n', root2);
 
-%first root
-left_bound = -15;
-right_bound = 10;
+    x_root = bi_root; % setting true root as root found via bisection, can replace with any other method if desired. fzero yields exact same precision result
+    
+    e_n0 = abs(bi_x0-x_root); %calculating errors
+    e_n1 = abs(bi_x1-x_root);
 
-a_thresh = 1e-14;
-b_thresh = 1e-14;
-max_it = 1000;
+    loglog(e_n0,e_n1,'ro','markerfacecolor','r','markersize',2); %loglog sanity check
 
-root1 = bisection_method(test_func01, left_bound, right_bound, a_thresh, b_thresh, max_it);
+end
 
-fprintf('The first root found is: %.14f\n', root1);
-
-%second root
-left_bound = 25;
-right_bound = 40;
-root2 = bisection_method(test_func01, left_bound, right_bound, a_thresh, b_thresh, max_it);
-fprintf('The second root found is: %.14f\n', root2);
+function [f, dfdx] = fun(x)
+    f =  (x.^3)/100 - (x.^2)/8 + 2*x + 6*sin(x/2+6) - 0.7 - exp(x/6);
+    dfdx =  (3*x.^2)/100 - (x)/4 + 2 + 3*cos(x/2 + 6)*0.5 - (1/6)*exp(x/6);
+end

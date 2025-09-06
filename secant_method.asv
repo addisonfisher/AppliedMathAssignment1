@@ -1,0 +1,36 @@
+%Secant Solver Problem
+
+function root_finder = secant_method(fun, x0, x1, a_thresh, b_thresh, max_iter)
+
+    %Secant solver takes two initial inputs and updates new guess off of
+    %the secant line of the two inputs
+
+    x_n = x1;
+    x_prev = x0; 
+
+    for i = max_iter
+        
+        %Defining function at guessed root
+        [f_n, ~] = fun(x_n);
+        
+        %Defining function at previous guessed root
+        [f_prev, ~] = fun(x_prev);
+
+        %Update previous root for secant method 
+        x_prev = x_n; 
+
+        %Update new root for secant method
+        x_next = x_n - f_n * ((x_n - x_prev)/(f_n - f_prev));
+        
+        if abs(x_next - x_prev) < a_thresh && f_n < b_thresh
+            disp("Root found")
+            break
+        end
+
+        x_n = x_next;
+    end 
+
+    if i == max_iter
+        disp
+    end
+end 
