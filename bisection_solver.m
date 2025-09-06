@@ -1,4 +1,4 @@
-function [x, guesses_c, guesses_fc] = bisection_solver(fun, x_left, x_right)
+function [x, guesses_c, guesses_fc, guesses_it] = bisection_solver(fun, x_left, x_right)
     if sign(fun(x_left)) == sign(fun(x_right))
         error('The initial interval does not cross zero. Bisection method will not work!');
     end
@@ -11,6 +11,7 @@ function [x, guesses_c, guesses_fc] = bisection_solver(fun, x_left, x_right)
     
     guesses_c = [];
     guesses_fc = [];
+    guesses_it = [];
 
     for i = 1:max_it
         c = (x_left + x_right) / 2;
@@ -18,9 +19,10 @@ function [x, guesses_c, guesses_fc] = bisection_solver(fun, x_left, x_right)
         delta_x = abs(c - c_old);
         f_c = fun(c);
 
-        if i > 1
+        if i > 0
             guesses_c(end+1) = c_old;
             guesses_fc(end+1) = fun(c_old);
+            guesses_it(end+1) = i;
         end
 
         if delta_x < a_thresh || abs(f_c) < b_thresh

@@ -4,9 +4,10 @@ function main()
     x_left = -15;
     x_right = 10;
     
-    [bi_root, bi_c, bi_fc] = bisection_solver(@fun, x_left, x_right);
-    bi_c; %c guesses for bisection
-    bi_fc; %f(c) guesses for bisection
+    [bi_root, bi_c, bi_fc, bi_guess_it] = bisection_solver(@fun, x_left, x_right);
+    bi_n_current; %current c guesses for bisection
+    bi_n_next; %next c guesses for bisection
+    bi_guess_it; %iteration number for bisection
     
     fprintf('The first root found is: %.14f\n', bi_root);
     
@@ -16,7 +17,7 @@ function main()
     % root2 = bisection_solver(@fun, x_left, x_right);
     % fprintf('The second root found is: %.14f\n', root2);
 
-    x_root = bi_root; % setting true root as root found via bisection, can replace with any other method if desired. 
+    x_root = bi_root; % setting true root as root found via bisection, can replace with any other method if desired. fzero yields exact same precision result
 
 end
 
