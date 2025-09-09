@@ -17,15 +17,27 @@ function convergence_analysis(solver_flag, fun, ...
     guess_it = [];
     
     for i = 1:200
-        x_left = randi([-30, -5]);
-        x_right = randi([5, 30]);
-        [bi_root, bi_x0, bi_x1, bi_guess_it] = bisection_solver(@fun, x_left, x_right);
+        x_left =
+        x_right =
 
-        x_root = bi_root; % setting true root as root found via bisection, can replace with any other method if desired. fzero yields exact same precision result
+        % Check if the solver_flag is valid and call the appropriate solver
+        switch solver_flag
+            case 1
+                [root, x0, x1, guess_it] = bisection_solver(@fun, x_left, x_right);
+            case 2
+                [root, guess_it] = newton_solver(@fun, x_guess0);
+            case 3
+                [root, guess_it] = secant_solver(@fun, x_left, x_right);
+            case 4
+                root = fzero(@fun, x_guess0);
+            otherwise
+                error('Invalid solver_flag. Must be an integer from 1 to 4.');
+        end
+
+        x_root = bisection_solver(@fun, x_left, x_right); % this runs every iteration FIX THIS!!!!!!!!!!!!!!!!
     
-        %e_n0(end+1) = abs(bi_x0-x_root); %calculating errors
-        e_n0 = [e_n0 abs(bi_x0-x_root)];
-        e_n1 = [e_n1 abs(bi_x1-x_root)];
+        e_n0 = [e_n0 abs(x0-x_root)];
+        e_n1 = [e_n1 abs(x1-x_root)];
         guess_it = [guess_it bi_guess_it];
     end
 

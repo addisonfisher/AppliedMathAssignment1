@@ -10,7 +10,7 @@ function [x, guesses_x0, guesses_x1, guesses_it] = bisection_solver(fun, x_left,
     c_old = x_left;
     
     c = (x_left + x_right) / 2;
-    f_c = fun(c);
+    f_c = 
 
     delta_x = 2*a_thresh;
     guesses = [];
