@@ -47,7 +47,7 @@ function [x, guesses_x0, guesses_x1, guesses_it] = bisection_solver(fun, x_left,
         x = c;
     end
 
-    fprintf('Converged after %d iterations.\n', i);
+    %fprintf('Converged after %d iterations.\n', i);
 
     guesses(end+1) = c;
 
