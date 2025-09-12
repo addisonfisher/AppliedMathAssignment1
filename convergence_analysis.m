@@ -9,7 +9,7 @@
 %guess_list2: a second list of initial guesses for each trial
 % if guess_list2 is not needed, then set to zero in input
 %filter_list: a list of constants used to filter the collected data
-function convergence_analysis(solver_flag, fun, ...
+function [root, p, k] = convergence_analysis(solver_flag, fun, ...
     x_guess0, guess_list1, guess_list2, filter_list)
 
     e_n0 = [];
@@ -43,11 +43,9 @@ function convergence_analysis(solver_flag, fun, ...
             case 3 % Secant
                 [x1_trial, x0_trial, it_trial, ~] = secant_method(fun, guess_list1(i), guess_list2(i), 1e-14, 1e-14, 100);
             case 4 % fzero
-                % NOTE: Data collection for fzero requires more advanced methods
-                % like global variables or an input recorder as described in the appendix.
-                % This basic implementation will just find the root.
+                % NEEDS WORK
                 root = fzero(fun, guess_list1(i));
-                disp('Data collection for fzero not implemented in this general function.');
+                disp('NEEDS WORK.');
             otherwise
                 error('Invalid solver_flag. Must be an integer from 1 to 4.');
         end
@@ -100,6 +98,8 @@ function convergence_analysis(solver_flag, fun, ...
     fprintf('Regression coefficients are:\n');
     fprintf('p: %.3f\n', p);
     fprintf('k: %.3f\n', k);
+
+    root = x_root;
 end
 
 % Helper function to get only the function value
