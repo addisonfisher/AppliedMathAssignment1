@@ -121,7 +121,7 @@ end
 function dfdx = get_dfdx(fun_handle, x)
     delta_x = 1e-6;
     dfdx = (fun_handle(x + delta_x) - fun_handle(x - delta_x)) / (2 * delta_x); %ASK ORION IF THIS IS OKAY
-    disp('ASK ORION IF THIS IS OKAY')
+    %disp('ASK ORION IF THIS IS OKAY')
 end
 
 %example for how to compute the fit line

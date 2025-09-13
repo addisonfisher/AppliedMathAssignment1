@@ -25,6 +25,8 @@ function [root, guesses] = newton_solver(fun, dfun, x0)
 
     i = 0;
     guesses = [x0];
+    x_n = x0;
+    
     while (i < max_iter)
         x_n = x0 - fun(x0)/dfun(x0);
         guesses(end + 1) = x_n;
@@ -37,4 +39,6 @@ function [root, guesses] = newton_solver(fun, dfun, x0)
         x0 = x_n;
     end
     guesses(end + 1) = root;
+
+    root = x_n;
 end
