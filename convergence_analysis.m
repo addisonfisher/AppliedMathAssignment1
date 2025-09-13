@@ -44,7 +44,7 @@ function [root, p, k] = convergence_analysis(solver_flag, fun, ...
                     it_trial = 1:length(x0_trial);
                 end
             case 3 % Secant
-                [x1_trial, x0_trial, it_trial, ~] = secant_method(fun, guess_list1(i), guess_list2(i), 1e-14, 1e-14, 100);
+                [~, x0_trial, x1_trial, it_trial] = secant_method(fun, guess_list1(i), guess_list2(i));
             case 4 % fzero
                 my_recorder.clear_input_list();
                 
