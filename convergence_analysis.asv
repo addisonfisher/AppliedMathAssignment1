@@ -87,9 +87,7 @@ function [root, p, k] = convergence_analysis(solver_flag, fun, ...
             y_regression(end+1) = e_n1(n);
         end
     end
-    
-    
-    
+
     [p, k] = generate_error_fit(x_regression, y_regression);
 
     figure;
@@ -119,9 +117,7 @@ end
 
 % Helper function to get only the derivative value
 function dfdx = get_dfdx(fun_handle, x)
-    delta_x = 1e-6;
-    dfdx = (fun_handle(x + delta_x) - fun_handle(x - delta_x)) / (2 * delta_x); %ASK ORION IF THIS IS OKAY
-    disp('ASK ORION IF THIS IS OKAY')
+    dfdx = fun_handle(x);
 end
 
 %example for how to compute the fit line

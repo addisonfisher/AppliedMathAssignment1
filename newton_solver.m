@@ -29,7 +29,7 @@ function [root, guesses] = newton_solver(fun, dfun, x0)
         x_n = x0 - fun(x0)/dfun(x0);
         guesses(end + 1) = x_n;
         root = x_n;
-        if (abs(x_n - x0) > x_thresh || abs(fun(x0)) < y_thresh)
+        if (abs(x_n - x0) > x_thresh || abs(fun(x0)) > y_thresh)
             i = i + 1;
         else 
             i = max_iter + 1;
