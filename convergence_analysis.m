@@ -16,7 +16,10 @@ function [root, p, k] = convergence_analysis(solver_flag, fun, ...
     e_n1 = [];
     guess_it = [];
 
-    % Compute the root once using a reliable method like fzero
+    % Create an instance of the input_recorder to capture fzeros guesses
+    my_recorder = input_recorder();
+
+    % Compute the root once using a reliable method- fzero
     x_root = fzero(fun, x_guess0);
     fprintf('The reference root found is: %.14f\n', x_root);
     
@@ -43,9 +46,21 @@ function [root, p, k] = convergence_analysis(solver_flag, fun, ...
             case 3 % Secant
                 [x1_trial, x0_trial, it_trial, ~] = secant_method(fun, guess_list1(i), guess_list2(i), 1e-14, 1e-14, 100);
             case 4 % fzero
-                % NEEDS WORK
-                root = fzero(fun, guess_list1(i));
-                disp('NEEDS WORK.');
+                my_recorder.clear_input_list();
+                
+                f_record = my_recorder.generate_recorder_fun(fun);
+                
+                % Run fzero with the recording function
+                fzero(f_record, guess_list1(i));
+                
+                % Retrieve the list of guesses
+                input_list = my_recorder.get_input_list();
+                
+                if length(input_list) > 1
+                    x0_trial = input_list(1:end-1);
+                    x1_trial = input_list(2:end);
+                    it_trial = 1:length(x0_trial);
+                end
             otherwise
                 error('Invalid solver_flag. Must be an integer from 1 to 4.');
         end
@@ -58,16 +73,11 @@ function [root, p, k] = convergence_analysis(solver_flag, fun, ...
         end
     end
 
-   
-    %example for how to filter the error data
-    %currently have error_list0, error_list1, index_list
-    %data points to be used in the regression
     x_regression = []; % e_n
     y_regression = []; % e_{n+1}
     %iterate through the collected data
     for n=1:length(guess_it)
-         %if the error is not too big or too small
-         %and it was enough iterations into the trial...
+         %check error
          if e_n0(n)>filter_list(1) && e_n0(n)<filter_list(2) && ...
             e_n1(n)>filter_list(3) && e_n1(n)<filter_list(4) && ...
             guess_it(n)>filter_list(5)
@@ -79,21 +89,18 @@ function [root, p, k] = convergence_analysis(solver_flag, fun, ...
 
     [p, k] = generate_error_fit(x_regression, y_regression);
 
+    figure;
     loglog(e_n0,e_n1,'ro','markerfacecolor','r','markersize',1); %loglog sanity check
     hold on;
-    %example for how to plot fit line
-    %generate x data on a logarithmic range
     fit_line_x = 10.^(-16:.01:1);
-    %compute the corresponding y values
     fit_line_y = k*fit_line_x.^p;
-    %plot on a loglog plot.
     loglog(x_regression, y_regression,'bo','markerfacecolor','b','markersize',1);
     loglog(fit_line_x,fit_line_y,'k-','linewidth',2)
 
     title('Convergence Analysis');
     xlabel('\epsilon_n');
     ylabel('\epsilon_{n+1}');
-    legend('Raw Data', 'Regression Data', 'Filtered Data', 'Location', 'NorthWest');
+    legend('Raw Data', 'Filtered Data', 'Fit Line', 'Location', 'NorthWest');
     hold off;
     fprintf('Regression coefficients are:\n');
     fprintf('p: %.3f\n', p);

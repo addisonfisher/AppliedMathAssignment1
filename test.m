@@ -8,7 +8,7 @@ function test
     x_guess0 = -5;
     
     % guess lists
-    num_trials = 200;
+    num_trials = 250;
     guess_list1 = randi([-30, -5], 1, num_trials); % x_left values
     guess_list2 = randi([5, 30], 1, num_trials);    % x_right values
     
