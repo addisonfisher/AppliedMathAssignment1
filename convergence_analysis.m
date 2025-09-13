@@ -86,7 +86,7 @@ function [root, p, k] = convergence_analysis(solver_flag, fun, ...
             y_regression(end+1) = e_n1(n);
         end
     end
-
+    
     [p, k] = generate_error_fit(x_regression, y_regression);
 
     figure;

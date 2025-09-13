@@ -23,17 +23,6 @@ function [x, guesses_x0, guesses_x1, guesses_it] = bisection_solver(fun, x_left,
         delta_x = abs(c - c_old);
         f_c = fun(c);
 
-        % if i > 0
-        %     guesses_x0(end+1) = c_old;
-        %     guesses_x1(end+1) = c;
-        %     guesses_it(end+1) = i;
-        % end
-        % 
-        % if 
-        %     x = c;
-        %     fprintf('Converged after %d iterations.\n', i);
-        %     return;
-        % end
         
         if sign(fun(x_left)) == sign(f_c) 
             guesses(end+1) = x_left;

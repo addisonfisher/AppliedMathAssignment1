@@ -16,30 +16,35 @@ function [x, guesses_x0, guesses_x1, guesses_it] = secant_method(fun, x0, x1)
     i = 0; 
 
     %Defining function at guessed root
-    [f_n, ~] = fun(x_n);
+    f_n = fun(x_n);
         
     %Defining function at previous guessed root
-    [f_prev, ~] = fun(x_prev);
+    f_prev = fun(x_prev);
 
-    while i < max_iter && abs(f_n - f_prev) < 1000000000 && abs(x_n - x_prev) < a_thresh && f_prev < b_thresh
+    while i < max_iter  && abs(x_n - x_prev) > a_thresh && abs(f_n) > b_thresh && abs(f_n - f_prev) < 1000000000
         
         %Defining function at guessed root
-        [f_n, ~] = fun(x_n);
+        f_n = fun(x_n);
         
         %Defining function at previous guessed root
-        [f_prev, ~] = fun(x_prev);
+        f_prev = fun(x_prev);
 
         %Update new root for secant method
-        x_prev = x_n; 
-        x_n = x_n - f_n * ((x_n - x_prev)/(f_n - f_prev));
+        x_next = x_n - f_n * ((x_n - x_prev)/(f_n - f_prev));
+        x_prev = x_n;
+        x_n = x_next;
         x = x_n;
         
-        guesses(end+1) = x;
 
-        guesses_x0 = guesses(1:end-1);
-        guesses_x1 = guesses(2:end);
-        guesses_it = 1:(length(guesses)-1);
+        i = i + 1;
+
+        guesses(end+1) = x;
+        
+        
     end
+    guesses_x0 = guesses(1:end-1);
+    guesses_x1 = guesses(2:end);
+    guesses_it = 1:(length(guesses)-1);
 end 
 
     % for i = max_iter
