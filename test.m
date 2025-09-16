@@ -1,6 +1,6 @@
 function test
 
-    solver_flag = 4;
+    solver_flag = 3;
     
     fun = @(x) (x.^3)/100 - (x.^2)/8 + 2*x + 6*sin(x/2+6) - 0.7 - exp(x/6);
     

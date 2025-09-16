@@ -33,7 +33,6 @@ function [root, p, k] = convergence_analysis(solver_flag, fun, ...
         switch solver_flag
             case 1 % Bisection
                 [~, x0_trial, x1_trial, it_trial] = bisection_solver(fun, guess_list1(i), guess_list2(i));
-                solver_title = "Bisection Method";
             case 2 % Newton
                 % Create separate function handles for f and df/dx for the newton_solver
                 f_handle = @(x) get_f(fun, x);
@@ -44,13 +43,11 @@ function [root, p, k] = convergence_analysis(solver_flag, fun, ...
                     x1_trial = guesses(2:end);
                     it_trial = 1:length(x0_trial);
                 end
-                solver_title = "Newton's Method";
             case 3 % Secant
                 [~, x0_trial, x1_trial, it_trial] = secant_method(fun, guess_list1(i), guess_list2(i));
-                solver_title = "Secant Method";
+           
             case 4 % fzero
                 my_recorder.clear_input_list();
-                solver_title = "fzero Method";
                 
                 f_record = my_recorder.generate_recorder_fun(fun);
                 
@@ -99,28 +96,19 @@ function [root, p, k] = convergence_analysis(solver_flag, fun, ...
     fit_line_x = 10.^(-16:.01:1);
     fit_line_y = k*fit_line_x.^p;
     loglog(fit_line_x,fit_line_y,'k-','linewidth',2)
-    title([solver_title, 'Convergence Analysis']);
+    title(['Convergence Analysis with the ', num2str(solver_flag), ' solver']);
     xlabel('\epsilon_n');
     ylabel('\epsilon_{n+1}');
+    legend('Raw Data', 'Filtered Data', 'Fit Line', 'Location', 'NorthWest');
     hold on;
 
     loglog(e_n0,e_n1,'ro','markerfacecolor','r','markersize',1); %loglog sanity check
     loglog(x_regression, y_regression,'bo','markerfacecolor','b','markersize',1);
-    legend( 'Fit Line', 'Raw Data', 'Filtered Data', 'Location', 'NorthWest');
     hold off;
     fprintf('Regression coefficients are:\n');
     fprintf('p: %.3f\n', p);
     fprintf('k: %.3f\n', k);
     root = x_root;
-    
-    
-    % % Compute the first and second derivatives at the root
-    % [dfdx_root, d2fdx2_root] = approximate_derivative(fun, x_root);
-    % 
-    % % Set a as the second derivative divided by the first derivative
-    % a = d2fdx2_root / dfdx_root;
-    % b = abs(0.5*a)
-
 end
 
 % Helper function to get only the function value
@@ -131,7 +119,8 @@ end
 % Helper function to get only the derivative value
 function dfdx = get_dfdx(fun_handle, x)
     delta_x = 1e-6;
-    dfdx = (fun_handle(x + delta_x) - fun_handle(x - delta_x)) / (2 * delta_x); 
+    dfdx = (fun_handle(x + delta_x) - fun_handle(x - delta_x)) / (2 * delta_x); %ASK ORION IF THIS IS OKAY
+    %disp('ASK ORION IF THIS IS OKAY')
 end
 
 %example for how to compute the fit line
