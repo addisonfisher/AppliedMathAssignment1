@@ -1,10 +1,10 @@
 function egg()
-    %set the oval hyper-parameters
+    % %set the oval hyper-parameters
     egg_params = struct();
     egg_params.a = 3;
     egg_params.b = 2;
     egg_params.c = .15;
-
+    % 
     %specify the position and orientation of the egg
     x0 = 5; y0 = 5; theta = pi/6;
 
@@ -14,25 +14,28 @@ function egg()
     axis square;
     axis([0, 10, 1, 10]);
     s_perimeter = linspace(0, 1, 100);
-   
-
+    % 
+    % 
     [V_vals, G_vals] = egg_func(s_perimeter, x0, y0, theta, egg_params);
-    plot(V_vals(1,:), V_vals(2,:), 'ko', 'LineWidth', 2);
-    plot(V_vals(1,:), V_vals(2,:), 'ro', 'markerfacecolor', 'r', 'markersize', 4);
+    plot(V_vals(1,:), V_vals(2,:), '-', 'LineWidth', 1);
+    %plot(V_vals(1,:), V_vals(2,:), 'ro', 'markerfacecolor', 'r', 'markersize', 4);
+    % 
+    % s_tangent = .3;
+    % [V_tangent, G_tangent] = egg_func(s_tangent, x0, y0, theta, egg_params)
+    % 
+    % plot(V_tangent(1), V_tangent(2), 'ro', 'markerfacecolor', 'r', 'markersize', 4);
+    % plot(V_tangent(1) + [0, G_tangent(1)], V_tangent(2) + [0, G_tangent(2)], 'k',  'LineWidth', 2);    
+    % 
+    % [xmin, xmax, ymin, ymax] = find_bounding_box(x0, y0, theta, egg_params)
+    % 
+    % plot ([xmin, xmax, xmax, xmin, xmin], [ymin, ymin, ymax, ymax, ymin], 'b-', 'LineWidth',2);
+    % hold off;
+    % 
+    % y_ground = 1;
+    % x_wall = 15;
+   
+    animation_example(@egg_trajectory01, 0, 25);
 
-    s_tangent = .3;
-    [V_tangent, G_tangent] = egg_func(s_tangent, x0, y0, theta, egg_params)
-
-    plot(V_tangent(1), V_tangent(2), 'ro', 'markerfacecolor', 'r', 'markersize', 4);
-    plot(V_tangent(1) + [0, G_tangent(1)], V_tangent(2) + [0, G_tangent(2)], 'k',  'LineWidth', 2);    
-
-    [xmin, xmax, ymin, ymax] = find_bounding_box(x0, y0, theta, egg_params)
-
-    plot ([xmin, xmax, xmax, xmin, xmin], [ymin, ymin, ymax, ymax, ymin], 'b-', 'LineWidth',2);
-
-    y_ground = 1;
-    x_wall = 15;
-    time = collision_func(@egg_trajectory01, egg_params, y_ground, x_wall)
 end
 
 function[xmin, xmax, ymin, ymax] = find_bounding_box(x0, y0, theta, egg_params)
@@ -148,7 +151,7 @@ end
 %OUTPUTS:
 %t_ground: time that the egg would hit the ground
 %t_wall: time that the egg would hit the wall
-function [t_ground,t_wall] = collision_func(traj_fun, egg_params, y_ground, x_wall)
+function [t_ground, t_wall] = collision_func(traj_fun, egg_params, y_ground, x_wall)
     %Pass in the function of x_wall - x_max (which we take from the
     %bounding box)
         
@@ -184,4 +187,59 @@ function [t_ground,t_wall] = collision_func(traj_fun, egg_params, y_ground, x_wa
     % 
     % t_ground = convergence_analysis(solver_flag, fy_min, x_guess0, guess_list1, guess_list2, filter_list);
     % %Pass in the function of y_min (also from bounding box)
+end
+
+%Short example demonstrating how to create a MATLAB animation
+%In this case, a square moving along an elliptical path
+function animation_example(traj_func, y_ground, x_wall)
+%Define the coordinates of the square vertices (in its own frame)
+
+%set up the plotting axis
+hold on; axis equal; axis square
+axis([0,40,0,40])
+%initialize the plot of the square
+egg_plot = plot(0,0,'r');
+box_plot = plot(0,0,'k');
+
+wall_plot = plot(0,0,'k', LineWidth=2);
+ground_plot = plot(0,0,'k', LineWidth=2);
+
+%Initialize egg params
+egg_params = struct();
+egg_params.a = 3;
+egg_params.b = 2;
+egg_params.c = .15;
+
+time = collision_func(traj_func, egg_params, y_ground, x_wall)
+
+hold on;
+
+%iterate through time
+for t=0:.001: abs(time)
+    [position_x, position_y, theta] = traj_func(t);
+    s_perimeter = linspace(0, 1, 100);
+    [V_vals, ~] = egg_func(s_perimeter, position_x, position_y, theta, egg_params);
+    %plot(V_vals(1,:), V_vals(2,:), '-', 'LineWidth', 1);
+
+    %compute positions of square vertices (in world frame)
+    x_plot = V_vals(1,:);
+    y_plot = V_vals(2,:);
+    
+    %update the coordinates of the square plot
+    set(egg_plot,'xdata',x_plot,'ydata',y_plot);
+    
+    [xmin, xmax, ymin, ymax] = find_bounding_box(position_x, position_y, theta, egg_params);
+
+    
+    set(box_plot,'xdata',[xmin, xmax, xmax, xmin, xmin],'ydata', [ymin, ymin, ymax, ymax, ymin]);
+    %update the actual plotting window
+
+    
+    set(wall_plot,'xdata',[x_wall, x_wall],'ydata', [0, 40]);
+
+    set(ground_plot,'xdata',[y_ground, y_ground],'ydata', [0, 40]);
+
+    drawnow;
+end
+
 end
