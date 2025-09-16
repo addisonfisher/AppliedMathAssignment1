@@ -29,10 +29,6 @@ function egg()
     [xmin, xmax, ymin, ymax] = find_bounding_box(x0, y0, theta, egg_params)
 
     plot ([xmin, xmax, xmax, xmin, xmin], [ymin, ymin, ymax, ymax, ymin], 'b-', 'LineWidth',2);
-
-    y_ground = 1;
-    x_wall = 15;
-    time = collision_func(@egg_trajectory01, egg_params, y_ground, x_wall)
 end
 
 function[xmin, xmax, ymin, ymax] = find_bounding_box(x0, y0, theta, egg_params)
@@ -128,15 +124,7 @@ function [x0,y0,theta] = egg_trajectory01(t)
     theta = 5*t;
 end
 
-function ymin = find_ymin(traj_func, t, egg_params)
-    [x0, y0, theta] = traj_func(t);
-
-    s_perimeter = linspace(0, 1, 1000);
-    [V, ~] = egg_func(s_perimeter, x0, y0, theta, egg_params);
-
-    ymin = min(V(2, :));
-
-end
+function ymin = find_ymin
 
 %Function that computes the collision time for a thrown egg
 %INPUTS:
@@ -152,8 +140,7 @@ function [t_ground,t_wall] = collision_func(traj_fun, egg_params, y_ground, x_wa
     %Pass in the function of x_wall - x_max (which we take from the
     %bounding box)
         
-    fy_min = @(t) find_ymin(traj_fun, t, egg_params);
-
+    fun_x = @(x) (x.^3)/100 - (x.^2)/8 + 2*x + 6*sin(x/2+6) - 0.7 - exp(x/6);
     % initial guess
     x_guess0 = -5;
     
@@ -164,24 +151,13 @@ function [t_ground,t_wall] = collision_func(traj_fun, egg_params, y_ground, x_wa
     
     % filtering constants
     filter_list = [1e-15, 1e-2, 1e-14, 1e-2, 2];
-    solver_flag = 2;
-    t_ground = convergence_analysis(solver_flag, fy_min, x_guess0, guess_list1, guess_list2, filter_list);
+    
+    convergence_analysis(solver_flag, fun, x_guess0, guess_list1, guess_list2, filter_list);
     %Pass in the function of y_min (also from bounding box)
 
-%-------------------------------------------------------------------------%
-    % fx_max = @(t) find_xmax_at_time(t, egg_params);
-    % 
-    % % initial guess
-    % x_guess0 = -5;
-    % 
-    % % guess lists
-    % num_trials = 250;
-    % guess_list1 = randi([-30, -5], 1, num_trials); % x_left values
-    % guess_list2 = randi([5, 30], 1, num_trials);    % x_right values
-    % 
-    % % filtering constants
-    % filter_list = [1e-15, 1e-2, 1e-14, 1e-2, 2];
-    % 
-    % t_ground = convergence_analysis(solver_flag, fy_min, x_guess0, guess_list1, guess_list2, filter_list);
-    % %Pass in the function of y_min (also from bounding box)
+    %Use a root-finding algorithm to find the time t
+
+
+    
+
 end
