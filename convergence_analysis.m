@@ -93,17 +93,17 @@ function [root, p, k] = convergence_analysis(solver_flag, fun, ...
     [p, k] = generate_error_fit(x_regression, y_regression);
 
     figure;
-    loglog(e_n0,e_n1,'ro','markerfacecolor','r','markersize',1); %loglog sanity check
-    hold on;
     fit_line_x = 10.^(-16:.01:1);
     fit_line_y = k*fit_line_x.^p;
-    loglog(x_regression, y_regression,'bo','markerfacecolor','b','markersize',1);
     loglog(fit_line_x,fit_line_y,'k-','linewidth',2)
-
     title('Convergence Analysis');
     xlabel('\epsilon_n');
     ylabel('\epsilon_{n+1}');
     legend('Raw Data', 'Filtered Data', 'Fit Line', 'Location', 'NorthWest');
+    hold on;
+
+    loglog(e_n0,e_n1,'ro','markerfacecolor','r','markersize',1); %loglog sanity check
+    loglog(x_regression, y_regression,'bo','markerfacecolor','b','markersize',1);
     hold off;
     fprintf('Regression coefficients are:\n');
     fprintf('p: %.3f\n', p);
