@@ -150,6 +150,7 @@ function xmax = find_xmax(traj_func, t, egg_params)
     xmax = max(V(1, :));
 end
 
+
 %Function that computes the collision time for a thrown egg
 %INPUTS:
 %traj_fun: a function that describes the [x,y,theta] trajectory
@@ -168,12 +169,14 @@ function [t_ground, t_wall] = collision_func(traj_fun, egg_params, y_ground, x_w
     fx_max = @(t) find_xmax(traj_fun, t, egg_params) - x_wall;
     
     % initial guess
-    x_guess0 = -0;
+    x_guess0 = 10;
     
     % guess lists
     num_trials = 250;
-    guess_list1 = linspace(0, 10, num_trials); % x_left values
-    guess_list2 = linspace(0.01, 10, num_trials);    % x_right values
+    tspan = linspace(0, 20, 250);   % search from t=0 to 20
+
+    guess_list1 = tspan(1:end-1);   % left guesses
+    guess_list2 = tspan(2:end);     % right guesses
     
     % filtering constants
     filter_list = [1e-15, 1e-2, 1e-14, 1e-2, 2];
@@ -205,7 +208,16 @@ egg_params.b = 2;
 egg_params.c = .15;
 
 [t_ground, t_wall] = collision_func(traj_func, egg_params, y_ground, x_wall);
-t_stop = t_wall; %min(t_wall, t_ground)
+
+if t_ground < 0 
+    t_ground = inf;
+end
+
+if t_wall < 0 
+    t_wall = inf;
+end
+
+t_stop = min(t_ground, t_wall); 
 hold on;
 
 %iterate through time
