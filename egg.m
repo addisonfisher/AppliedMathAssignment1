@@ -141,6 +141,15 @@ function ymin = find_ymin(traj_func, t, egg_params)
 
 end
 
+function xmax = find_xmax(traj_func, t, egg_params)
+    [x0, y0, theta] = traj_func(t);
+
+    s_perimeter = linspace(0, 1, 1000);
+    [V, ~] = egg_func(s_perimeter, x0, y0, theta, egg_params);
+
+    xmax = max(V(1, :));
+end
+
 %Function that computes the collision time for a thrown egg
 %INPUTS:
 %traj_fun: a function that describes the [x,y,theta] trajectory
@@ -155,38 +164,23 @@ function [t_ground, t_wall] = collision_func(traj_fun, egg_params, y_ground, x_w
     %Pass in the function of x_wall - x_max (which we take from the
     %bounding box)
         
-    fy_min = @(t) find_ymin(traj_fun, t, egg_params);
-
+    fy_min = @(t) find_ymin(traj_fun, t, egg_params) - y_ground;
+    fx_max = @(t) find_xmax(traj_fun, t, egg_params) - x_wall;
+    
     % initial guess
-    x_guess0 = -5;
+    x_guess0 = -0;
     
     % guess lists
     num_trials = 250;
-    guess_list1 = randi([-30, -5], 1, num_trials); % x_left values
-    guess_list2 = randi([5, 30], 1, num_trials);    % x_right values
+    guess_list1 = linspace(0, 10, num_trials); % x_left values
+    guess_list2 = linspace(0.01, 10, num_trials);    % x_right values
     
     % filtering constants
     filter_list = [1e-15, 1e-2, 1e-14, 1e-2, 2];
     solver_flag = 2;
     t_ground = convergence_analysis(solver_flag, fy_min, x_guess0, guess_list1, guess_list2, filter_list);
-    %Pass in the function of y_min (also from bounding box)
+    t_wall = convergence_analysis(solver_flag, fx_max, x_guess0, guess_list1, guess_list2, filter_list);
 
-%-------------------------------------------------------------------------%
-    % fx_max = @(t) find_xmax_at_time(t, egg_params);
-    % 
-    % % initial guess
-    % x_guess0 = -5;
-    % 
-    % % guess lists
-    % num_trials = 250;
-    % guess_list1 = randi([-30, -5], 1, num_trials); % x_left values
-    % guess_list2 = randi([5, 30], 1, num_trials);    % x_right values
-    % 
-    % % filtering constants
-    % filter_list = [1e-15, 1e-2, 1e-14, 1e-2, 2];
-    % 
-    % t_ground = convergence_analysis(solver_flag, fy_min, x_guess0, guess_list1, guess_list2, filter_list);
-    % %Pass in the function of y_min (also from bounding box)
 end
 
 %Short example demonstrating how to create a MATLAB animation
@@ -210,16 +204,15 @@ egg_params.a = 3;
 egg_params.b = 2;
 egg_params.c = .15;
 
-time = collision_func(traj_func, egg_params, y_ground, x_wall)
-
+[t_ground, t_wall] = collision_func(traj_func, egg_params, y_ground, x_wall);
+t_stop = t_wall; %min(t_wall, t_ground)
 hold on;
 
 %iterate through time
-for t=0:.001: abs(time)
+for t=0:.001:t_stop %abs(time)
     [position_x, position_y, theta] = traj_func(t);
     s_perimeter = linspace(0, 1, 100);
     [V_vals, ~] = egg_func(s_perimeter, position_x, position_y, theta, egg_params);
-    %plot(V_vals(1,:), V_vals(2,:), '-', 'LineWidth', 1);
 
     %compute positions of square vertices (in world frame)
     x_plot = V_vals(1,:);
@@ -237,7 +230,7 @@ for t=0:.001: abs(time)
     
     set(wall_plot,'xdata',[x_wall, x_wall],'ydata', [0, 40]);
 
-    set(ground_plot,'xdata',[y_ground, y_ground],'ydata', [0, 40]);
+    set(ground_plot,'xdata',[0, 40],'ydata', [y_ground, y_ground]);
 
     drawnow;
 end
