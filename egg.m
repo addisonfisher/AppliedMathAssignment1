@@ -189,9 +189,20 @@ end
 %Short example demonstrating how to create a MATLAB animation
 %In this case, a square moving along an elliptical path
 function animation_example(traj_func, y_ground, x_wall)
+
+mypath = 'C:\Users\jvazhaeparampil\Downloads';
+fname='egg_animation.avi';
+
+input_fname = [mypath,fname];
+%create a videowriter, which will write frames to the animation file
+writerObj = VideoWriter(input_fname);
+%must call open before writing any frames
+open(writerObj);
+
 %Define the coordinates of the square vertices (in its own frame)
 
 %set up the plotting axis
+fig1 = figure;
 hold on; axis equal; axis square
 axis([0,40,0,40])
 %initialize the plot of the square
@@ -245,6 +256,13 @@ for t=0:.001:t_stop %abs(time)
     set(ground_plot,'xdata',[0, 40],'ydata', [y_ground, y_ground]);
 
     drawnow;
+
+    %capture a frame (what is currently plotted)
+    current_frame = getframe(fig1);
+    %write the frame to the video
+    writeVideo(writerObj,current_frame);
 end
 
+    %must call close after all frames are written
+    close(writerObj);
 end
